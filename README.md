@@ -16,7 +16,7 @@ home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-95
 
 ---
 
-# What this project is for 
+# What this project is for
 
 A portable **standalone Home Manager** setup that can be reused across operating systems
 (Debian, NixOS, …) as long as you are willing to tinker with Nix. This is the **master**
