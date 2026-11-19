@@ -1,0 +1,24 @@
+{
+  "pins": {
+    "deckcraft": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "storytold",
+        "repo": "deckcraft"
+      },
+      "branch": "release",
+      "submodules": false,
+      "revision": "9ec39267931c0163dd5648c879043edcb9603cb8",
+      "url": "https://github.com/storytold/deckcraft/archive/9ec39267931c0163dd5648c879043edcb9603cb8.tar.gz",
+      "hash": "sha256-sxLcPfXXitvbQWWRV3pdsLEHYLde05qp7/QRinNz0xc="
+    },
+    "nixpkgs": {
+      "type": "Channel",
+      "name": "nixpkgs-unstable",
+      "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1100667.674a2028661e/nixexprs.tar.xz",
+      "hash": "sha256-GNxqGToDYDZH2M4YeIj5nLPEyljtn3hEdIFY1/JNm0M="
+    }
+  },
+  "version": 7
+}
