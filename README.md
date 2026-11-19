@@ -1,4 +1,22 @@
-# What this project is for
+# This branch: `configuration/home`
+
+Personal profile for **imamontov@NB-9558** (Debian sid), built on top of **master**.
+
+- `flake.nix` exposes `homeConfigurations."imamontov@NB-9558"` via `mkHM` with `isDebian = true`.
+- `machines/imamontov.nix` **adds only** the personal/dev profile on master (dev build tools,
+  nautilus, flameshot, gnome-keyring). Nothing here removes a master feature.
+- The `configuration/work` branch adds work apps on top of this branch.
+
+Apply:
+```bash
+git checkout configuration/home
+git submodule update --init --recursive
+home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-9558' -b backup
+```
+
+---
+
+# What this project is for 
 
 A portable **standalone Home Manager** setup that can be reused across operating systems
 (Debian, NixOS, …) as long as you are willing to tinker with Nix. This is the **master**
