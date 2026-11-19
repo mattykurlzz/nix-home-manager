@@ -49,5 +49,5 @@ Unfortunately, this one you will have to do imperatively because you want to hav
 ## Updating 
 After HM setup, updating is the same for any OS:
 ```bash
-home-manager switch --flake ~/.config/home-manager#<user>@<host>
+home-manager switch --flake '.?submodules=1#<user>' -b backup
 ```
