@@ -22,7 +22,6 @@
     # languages (rust toolchain for building)
     cargo
     rustc
-    rustup
     # misc dev/format
     shfmt
     tree
