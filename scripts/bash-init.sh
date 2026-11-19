@@ -4,7 +4,7 @@ case $- in
     *) return ;;
 esac
 
-# ble.sh (path is symlinked by home-manager above)
+# ble.sh (path is symlinked by home-manager)
 [ -f ~/.local/share/blesh/ble.sh ] && source ~/.local/share/blesh/ble.sh
 
 # ls colors (dircolors lives in the Nix store, found via PATH)

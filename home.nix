@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   imports = [
@@ -11,6 +11,11 @@
 
   # Expose blesh at the path your script already uses
   home.file.".local/share/blesh".source = "${pkgs.blesh}/share/blesh";
+  home.file.".blerc".source = ./dotfiles/.blerc;
+  home.file.".config" = {
+    source = ./dotfiles/.config;
+    recursive = true;
+  };
 
   programs.bash = {
     enable = true;
@@ -23,7 +28,7 @@
     ];
     enableCompletion = true;
 
-    initExtra = builtins.readFile ./scripts/bash-init.sh;
+    initExtra = builtins.readFile ./dotfiles/.bashrc;
   };
   nixpkgs.config.allowUnfree = true;
 
