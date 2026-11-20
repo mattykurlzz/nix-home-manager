@@ -1,48 +1,48 @@
 # What this project is for
 
 A portable **standalone Home Manager** setup that can be reused across operating systems
-(Debian, NixOS, …) as long as you are willing to tinker with Nix. This is the **master**
-branch — the OS-agnostic **default** that all per-machine branches build on.
+(Debian, NixOS, …). Everything lives on **master**: there are no per-OS branches. Per-OS
+(`isDebian`) and per-use (`role`) differences are selected at **build time** — you invoke
+the config matching the machine you are on.
 
-## Repository / branch model
+## Model (single flake, no branches)
 
-- **`master`** — the portable *default* config. Content here is **common/essential only**.
-  Machine identity (`home.username`, `homeDirectory`, host, `isDebian`) is intentionally **not**
-  hardcoded; it is parameterized through `lib.nix` → `mkHM`.
-- **`configuration/*`** — per-machine / per-role overlays (e.g. `configuration/home`,
-  `configuration/work`). They **branch off `master` (or a sibling configuration branch) and
-  ADD ONLY** — they never remove or replace a `master` entry. Unwanted master features are
-  disabled via a flag/override *in the branch*, never by deleting from master.
-- **`machines/<user>.nix`** — a host's personal/profile overlay.
-- **`workers/<role>.nix`** — role overlay (e.g. work) on top of a machine profile.
-- **`lib.nix`** — `mkHM` helper so every branch wires modules the same way.
+- **`lib.nix` → `mkConfig`** — one module-wiring helper. It sets the package set (with the
+  `baseOverlays`, e.g. `kilocode-cli`), passes `{ role, isDebian }` to every module, and
+  bundles the personal + role profiles. OS and role are **parameters**, not branches.
+- **`role`** — `"base"` (portable default), `"home"` (NixOS, personal), `"work"` (Debian, work).
+- **`isDebian`** — `true` enables `targets.genericLinux` (standalone HM on non-NixOS); must be
+  `false` on NixOS.
+- **`machines/imamontov.nix`** — personal/dev profile, role-aware (`mkIf role` picks e.g.
+  `rustup` for home, `kilocode-cli` for work).
+- **`workers/work.nix`** — work role apps, imported only when `role == "work"`.
+- **`software/*`** — portable base software, all roles.
+- **`dotfiles`** — git submodule with niri/waybar/alacritty configs, linked by `home.nix`.
 
-### Creating a new machine branch
+Everything follows the rule **ADDS ONLY**: unwanted base features are disabled via a flag /
+`mkIf`, never by deleting from a branch (there are no branches).
 
-```bash
-git checkout master
-git checkout -b configuration/<myname>
-# flake.nix: add yours
-homeConfigurations."<user>@<host>" = mkHM {
-  username = "<user>";
-  host = "<host>";
-  isDebian = true;           # false on NixOS
-  extraModules = [ ./machines/<user>.nix ];
-};
-```
-Put profile additions in `machines/<user>.nix` (only additions!). Commit, push branch.
+## Exposed configs (`flake.nix` → `homeConfigurations`)
+
+| Config                        | OS     | role   | notes                              |
+| ----------------------------- | ------ | ------ | ---------------------------------- |
+| `default`                     | any    | base   | portable / CI                      |
+| `imamontov@NB-9558-debian`    | Debian | work   | personal + work + kilo + niri      |
+| `imamontov@NB-9558-nixos`     | NixOS  | home   | personal (rustup), no genericLinux |
 
 ## Apply / switch
 
 Always apply with submodules fetched (the `dotfiles` submodule is required):
 
 ```bash
-home-manager switch --flake '~/.config/home-manager?submodules=1#<user>@<host>' -b backup
-```
+# Debian (work use):
+home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-9558-debian' -b backup
 
-Update to the latest generation:
-```bash
-home-manager switch --flake '.?submodules=1#<user>' -b backup
+# NixOS (home use):
+home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-9558-nixos' -b backup
+
+# Update from inside the repo:
+home-manager switch --flake '.?submodules=1#imamontov@NB-9558-debian' -b backup
 ```
 
 ## 1. Debian (generic Linux)
@@ -62,12 +62,10 @@ echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 ### Clone & Bootstrap
 ```bash
 git clone git@github.com:mattykurlzz/nix-home-manager.git ~/.config/home-manager
-# checkout the machine branch, then switch with submodules:
-git -C ~/.config/home-manager checkout configuration/home
 git -C ~/.config/home-manager submodule init && git -C ~/.config/home-manager submodule update --init --recursive
-home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-9558' -b backup
+home-manager switch --flake '~/.config/home-manager?submodules=1#imamontov@NB-9558-debian' -b backup
 ```
-On Debian the flake must pass `isDebian = true` so `targets.genericLinux.enable = true;`
+On Debian the config passes `isDebian = true` so `targets.genericLinux.enable = true;`
 (the profile's bin dirs get added to PATH, etc.). On NixOS it must stay `false`.
 
 ## 2. NixOS
@@ -85,12 +83,23 @@ Add to `/etc/nixos/configuration.nix` and run `sudo nixos-rebuild switch`:
 ### Clone & Bootstrap
 ```bash
 git clone git@github.com:mattykurlzz/nix-home-manager.git ~/.config/home-manager
-nix run home-manager/master -- switch --flake ~/.config/home-manager#<user>@<nixos-host>
+git -C ~/.config/home-manager submodule update --init --recursive
+nix run home-manager/master -- switch --flake ~/.config/home-manager#imamontov@NB-9558-nixos -b backup
 ```
 Note: on NixOS you bootstrap imperatively so HM stays self-sustaining and not tied to the
-system config. Use `isDebian = false`.
+system config. Use `isDebian = false` (already set for the nixos config).
 
-## Updating
+## Adding a new config (no branch)
+
 ```bash
-home-manager switch --flake '.?submodules=1#<user>' -b backup
+# flake.nix: add an entry
+homeConfigurations."<user>@<host>-<os>" = mkConfig {
+  username = "<user>";
+  host = "<host>";
+  role = "<base|home|work>";
+  isDebian = true;   # false on NixOS
+  personal = true;   # include the imamontov@NB-9558 personal profile, if wanted
+};
 ```
+Put machine-specific additions in `machines/<user>.nix` (role-aware `mkIf`s), role apps in
+`workers/<role>.nix`. Commit, push to master.

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, role ? "base", ... }:
 
 {
     home.packages = with pkgs; [
@@ -6,5 +6,5 @@
       git
       docker
       git-graph
-    ];
+    ] ++ lib.optionals (role == "work") [ pass ];
 }

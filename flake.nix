@@ -1,5 +1,5 @@
 {
-  description = "Standalone Home Manager Flake — portable default (master). Per-machine identity and overrides live on the configuration/* branches.";
+  description = "Standalone Home Manager flake — portable base + per-OS/per-role configs, all on master (no per-OS branches).";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -13,15 +13,32 @@
     { nixpkgs, home-manager, ... }@inputs:
     let
       lib' = import ./lib.nix { inherit nixpkgs home-manager; };
-      mkHM = lib'.mkHM;
+      mkConfig = lib'.mkConfig;
     in
     {
-      # Portable default/CI configuration. Real per-machine configs live on the
-      # configuration/* branches, e.g.:
-      #   home-manager switch --flake '~/.config/home-manager#imamontov@NB-9558'
-      homeConfigurations."default" = mkHM {
+      # Portable default / CI configuration: no OS, no role, no personal profile.
+      homeConfigurations."default" = mkConfig {
         username = let u = builtins.getEnv "USER"; in if u == "" then "default" else u;
         host = "default";
+        role = "base";
+      };
+
+      # Work use on Debian: personal/dev profile + work apps + kilo CLI + niri/waybar.
+      homeConfigurations."imamontov@NB-9558-debian" = mkConfig {
+        username = "imamontov";
+        host = "NB-9558";
+        role = "work";
+        isDebian = true;
+        personal = true;
+      };
+
+      # Home use on NixOS: personal/dev profile (rustup, no kilo), no genericLinux.
+      homeConfigurations."imamontov@NB-9558-nixos" = mkConfig {
+        username = "imamontov";
+        host = "NB-9558";
+        role = "home";
+        isDebian = false;
+        personal = true;
       };
     };
 }
