@@ -5,5 +5,6 @@
       alacritty
       git
       docker
+      git-graph
     ];
 }
