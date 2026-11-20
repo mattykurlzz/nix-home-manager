@@ -18,14 +18,21 @@ in
   #   host          -> machine label (used only for documentation)
   #   isDebian      -> enable `targets.genericLinux` (standalone HM on non-NixOS)
   #   extraModules  -> machine/role overlays, applied on top of master
+  #   extraOverlays -> nixpkgs overlays applied before building the HM pkgs
+  #                    (e.g. to add non-upstream packages like `kilocode-cli`)
   mkHM =
     { username
     , host
     , isDebian ? false
     , extraModules ? [ ]
+    , extraOverlays ? [ ]
     }:
+    let
+      basePkgs = nixpkgs.legacyPackages.${system};
+      pkgs = basePkgs.extend (nixpkgs.lib.composeManyExtensions extraOverlays);
+    in
     home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.${system};
+      inherit pkgs;
       extraSpecialArgs = { inherit isDebian; };
       modules =
         [

@@ -33,6 +33,8 @@
     go
     # lua package manager (luarocks was apt)
     luarocks
+    # kilo programming CLI (was npm-global @kilocode/cli)
+    kilocode-cli
   ];
 
   # Secrets for git/bluez/etc. (gnome-keyring was in apt; HM manages the user daemon).
