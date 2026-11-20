@@ -1,20 +1,22 @@
-{ pkgs, ... }:
+{ pkgs, role, ... }:
 
 {
   home.packages = with pkgs; [
-    spotify
-    kdePackages.kdenlive
-    vlc
-
     (vivaldi.override {
       commandLineArgs = "--password-store=gnome-libsecret";
     })
-    tor-browser
     telegram-desktop
+
+    xwayland-satellite
+  ] ++ lib.optionals (role == "home") [ 
+    spotify
+    kdePackages.kdenlive
+    vlc
+    tor-browser
     discord
     steam
     mangohud
-
-    xwayland-satellite
-  ];
+ ] ++ lib.optionals (role == "work") [ 
+    mattermost-desktop
+ ];
 }

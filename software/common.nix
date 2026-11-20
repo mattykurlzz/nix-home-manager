@@ -1,4 +1,4 @@
-{ pkgs, lib, role ? "base", ... }:
+{ pkgs, lib, role, ... }:
 
 {
     home.packages = with pkgs; [

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, role, ... }:
 
 {
   home.packages = with pkgs; [
@@ -30,5 +30,6 @@
 
     # misc
     vscode-extensions.vadimcn.vscode-lldb.adapter
-  ];
+  ]
+    ++ lib.optionals (role == "home") [ rustup ];
 }

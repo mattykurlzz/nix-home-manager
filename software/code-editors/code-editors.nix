@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, role, ... }:
 
 {
   imports = [ ./languages-support.nix ];
@@ -15,5 +15,6 @@
     curl
     gnumake
     ripgrep
-  ];
+  ]
+    ++ lib.optionals (role == "work") [ kilocode-cli ];
 }

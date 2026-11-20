@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./niri.nix
     ./power-menu.nix
     ./waybar.nix
   ];

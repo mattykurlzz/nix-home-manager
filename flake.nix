@@ -24,21 +24,20 @@
       };
 
       # Work use on Debian: personal/dev profile + work apps + kilo CLI + niri/waybar.
-      homeConfigurations."imamontov@NB-9558-debian" = mkConfig {
+      homeConfigurations."imamontov" = mkConfig {
         username = "imamontov";
         host = "NB-9558";
         role = "work";
         isDebian = true;
-        personal = true;
+#         personal = true;
       };
 
-      # Home use on NixOS: personal/dev profile (rustup, no kilo), no genericLinux.
-      homeConfigurations."imamontov@NB-9558-nixos" = mkConfig {
-        username = "imamontov";
-        host = "NB-9558";
+      homeConfigurations."avnek" = mkConfig {
+        username = "avnek";
+        host = "avnek";
         role = "home";
         isDebian = false;
-        personal = true;
+#         personal = true;
       };
     };
 }

@@ -1,17 +1,10 @@
-{ pkgs, config, lib, isDebian ? false, ... }:
+{ pkgs, config, lib, isDebian, role, ... }:
 
 {
   imports = [
     ./software/software.nix
   ];
 
-  # Machine identity (username / home dir / host) is intentionally NOT set here:
-  # master is the portable default. The `configuration/*` branches (via `lib.mkHM`)
-  # supply the real identity and os-specific flags.
-  #
-  # Standalone Home Manager on bare Debian / generic Linux needs this so the profile's
-  # `bin` dirs are added to PATH and activation approximates NixOS. It must stay OFF
-  # on NixOS (which provides its own activation).
   targets.genericLinux.enable = isDebian;
 
   home.stateVersion = "26.05"; # do not change
@@ -40,4 +33,6 @@
   nixpkgs.config.allowUnfree = true;
 
   programs.home-manager.enable = true;
+
+  services.gnome-keyring.enable = true;
 }
