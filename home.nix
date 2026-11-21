@@ -1,4 +1,11 @@
-{ pkgs, config, lib, isDebian, role, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  isDebian,
+  role,
+  ...
+}:
 
 {
   imports = [
