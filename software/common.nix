@@ -1,10 +1,22 @@
-{ pkgs, lib, role, ... }:
+{
+  pkgs,
+  lib,
+  role,
+  ...
+}:
 
 {
-    home.packages = with pkgs; [
+  home.packages =
+    with pkgs;
+    [
       alacritty
       git
       docker
+      docker-compose
       git-graph
-    ] ++ lib.optionals (role == "work") [ pass ];
+
+      # For yazi gvfs mount
+      glib
+    ]
+    ++ lib.optionals (role == "work") [ pass ];
 }
